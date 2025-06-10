@@ -1,19 +1,17 @@
-// src/components/ProductDetails.jsx
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Container, Row, Col, Card, Button, Image } from 'react-bootstrap';
-import { FaHeart, FaRegHeart } from 'react-icons/fa'; // Importa los íconos de corazón
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  // Añade 'favorites' y 'toggleFavorite' del contexto
+  
   const { products, deleteProduct, restoreProduct, favorites, toggleFavorite } = useAppContext();
   const navigate = useNavigate();
 
   const product = products.find(p => p.id === parseInt(id));
 
-  // Determina si el producto actual es favorito
   const isFavorite = product ? favorites.includes(product.id) : false;
 
   if (!product) {
@@ -67,17 +65,17 @@ const ProductDetails = () => {
                 <strong>Descripción:</strong> {product.description}
               </Card.Text>
               <div className="d-grid gap-2">
-                {/* Botón para editar - PRIMERO */}
+
                 <Button variant="info" onClick={() => navigate(`/form?id=${product.id}`)}>
                   Editar producto
                 </Button>
 
-                {/* Botón para volver a la lista - SEGUNDO */}
+                
                 <Button variant="secondary" onClick={() => navigate('/')}>
                   Volver a la lista
                 </Button>
 
-                {/* Botón para eliminar o restaurar - ÚLTIMO */}
+                
                 {isProductActive ? (
                   <Button variant="danger" onClick={() => {
                     if (window.confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {

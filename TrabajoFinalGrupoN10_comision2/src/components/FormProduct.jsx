@@ -1,4 +1,3 @@
-// src/components/FormProduct.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -30,27 +29,25 @@ const ProductsForm = () => {
   const [isFormModified, setIsFormModified] = useState(false);
   const originalFormData = useRef(initialFormDataState);
 
-  // useEffect para cargar los datos del producto si estamos en modo edición
   useEffect(() => {
     if (productId) {
       const productToEdit = products.find(p => p.id === parseInt(productId));
       if (productToEdit) {
-        // Asegúrate de formatear la fecha para el input type="date"
         const formattedDate = productToEdit.dateInit ? new Date(productToEdit.dateInit).toISOString().split('T')[0] : '';
         const loadedData = {
           name: productToEdit.name || '',
           price: productToEdit.price || '',
           category: productToEdit.category || '',
           stock: productToEdit.stock || '',
-          dateInit: formattedDate, // Usar la fecha formateada
+          dateInit: formattedDate,
           description: productToEdit.description || '',
           preview: productToEdit.preview || '',
         };
         setFormData(loadedData);
-        originalFormData.current = loadedData; // Guarda la data original
+        originalFormData.current = loadedData;
         setIsEditing(true);
         setSelectedFile(null);
-        setIsFormModified(false); // Al cargar, el formulario no está modificado
+        setIsFormModified(false);
       } else {
         console.warn(`Producto con ID ${productId} no encontrado para edición.`);
         setIsEditing(false);
@@ -64,11 +61,10 @@ const ProductsForm = () => {
       setFormData(initialFormDataState);
       originalFormData.current = initialFormDataState;
       setSelectedFile(null);
-      setIsFormModified(false); // En modo creación, el botón de agregar debe habilitarse cuando hay datos
+      setIsFormModified(false);
     }
   }, [productId, products]);
 
-  // useEffect para verificar si el formulario ha sido modificado
   useEffect(() => {
     if (isEditing) {
       const currentData = {
@@ -80,11 +76,11 @@ const ProductsForm = () => {
         description: formData.description,
         preview: formData.preview,
       };
-      // Comparar formData con originalFormData.current
+
       const changed = JSON.stringify(currentData) !== JSON.stringify(originalFormData.current) || selectedFile !== null;
       setIsFormModified(changed);
     } else {
-      // En modo creación, el formulario se considera modificado si al menos un campo obligatorio tiene valor
+
       const hasAnyRequiredField = formData.name || formData.price || formData.category || formData.stock || formData.dateInit || formData.description || formData.preview || selectedFile;
       setIsFormModified(hasAnyRequiredField);
     }
@@ -145,11 +141,10 @@ const ProductsForm = () => {
 
   const currentPreview = selectedFile ? URL.createObjectURL(selectedFile) : formData.preview;
 
-  // Helper para mostrar el valor original si es diferente
   const renderOriginalValueHint = (fieldName) => {
     if (isEditing && originalFormData.current[fieldName] !== undefined && formData[fieldName] !== originalFormData.current[fieldName]) {
       let originalValue = originalFormData.current[fieldName];
-      // Si es fecha, se muestra como un string normal para que sea legible
+
       if (fieldName === 'dateInit' && originalValue) {
         originalValue = new Date(originalValue).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
       }
@@ -257,8 +252,8 @@ const ProductsForm = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
-                  disabled={!!formData.preview} // Deshabilita si hay una URL
-                  ref={fileInputRef} // Asigna la referencia
+                  disabled={!!formData.preview}
+                  ref={fileInputRef}
                 />
                  {isEditing && !selectedFile && originalFormData.current.preview && (
                     <Form.Text className="text-muted">
@@ -269,7 +264,6 @@ const ProductsForm = () => {
 
               <p className="text-center my-3">-- O --</p>
 
-              {/* OPCIÓN 2: URL de Imagen */}
               <Form.Group className="mb-3" controlId="formPreview">
                 <Form.Label>URL de Imagen</Form.Label>
                 <Form.Control
@@ -278,12 +272,11 @@ const ProductsForm = () => {
                   name="preview"
                   value={formData.preview}
                   onChange={handleChange}
-                  disabled={!!selectedFile} // Deshabilita si hay un archivo seleccionado
+                  disabled={!!selectedFile}
                 />
                 {renderOriginalValueHint('preview')}
               </Form.Group>
 
-              {/* Previsualización de la imagen */}
               {currentPreview && (
                 <div className="mb-3 text-center">
                     <p className="text-muted">Previsualización:</p>

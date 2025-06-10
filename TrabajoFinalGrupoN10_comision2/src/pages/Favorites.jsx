@@ -1,15 +1,13 @@
-// src/pages/FavoritesPage.jsx
 import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useAppContext } from '../context/AppContext';
-import ProductCard from '../components/ProductCard'; // Reutilizamos ProductCard
+import ProductCard from '../components/ProductCard';
 import { useNavigate } from 'react-router-dom';
 
 const Favorites = () => {
   const { products, favorites } = useAppContext();
   const navigate = useNavigate();
 
-  // Filtra los productos para obtener solo los que están en la lista de favoritos
   const favoriteProducts = products.filter(product => favorites.includes(product.id) && product.state !== false);
 
   return (
