@@ -1,11 +1,25 @@
-import { createContext, useContext, useState } from 'react';
+// src/context/AppContext.js
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AppContext = createContext();
 
-export const AppProvider = ({ children }) => {
+export const useAppContext = () => useContext(AppContext);
 
-  const [products, setProducts] = useState([]);
+export const AppProvider = ({ children }) => {
+  const [products, setProducts] = useState([]); // Aquí se inicializa como array vacío
   const [idProduct, setIdProduct] = useState(1);
+
+  const [favorites, setFavorites] = useState(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  
 
   const addProduct = (product) => {
     const newProduct = {
@@ -13,27 +27,45 @@ export const AppProvider = ({ children }) => {
       id: idProduct,
       state: true,
     };
-    setProducts([...products, newProduct]);
-    setIdProduct(idProduct + 1);
+    setProducts(prevProducts => [...prevProducts, newProduct]);
+    setIdProduct(prevId => prevId + 1);
   };
 
   const deleteProduct = (id) => {
-    setProducts(products.map((p) =>
-      p.id === id ? { ...p, state: false } : p
-    ));
+    setProducts(prevProducts =>
+      prevProducts.map(product =>
+        product.id === id ? { ...product, state: false } : product
+      )
+    );
+    setFavorites(prevFavorites => prevFavorites.filter(favId => favId !== id));
   };
 
   const restoreProduct = (id) => {
-    setProducts(products.map((p) =>
-      p.id === id ? { ...p, state: true } : p
-    ));
+    setProducts(prevProducts =>
+      prevProducts.map(product =>
+        product.id === id ? { ...product, state: true } : product
+      )
+    );
   };
 
   const editingProduct = (productoEditado) => {
-    setProducts(products.map((p) =>
-      p.id === productoEditado.id ? { ...productoEditado } : p
-    ));
+    setProducts(prevProducts =>
+      prevProducts.map(product =>
+        product.id === productoEditado.id ? { ...productoEditado, state: product.state } : product
+      )
+    );
   };
+
+  const toggleFavorite = (productId) => {
+    setFavorites(prevFavorites => {
+      if (prevFavorites.includes(productId)) {
+        return prevFavorites.filter(id => id !== productId);
+      } else {
+        return [...prevFavorites, productId];
+      }
+    });
+  };
+
 
   return (
     <AppContext.Provider
@@ -43,11 +75,11 @@ export const AppProvider = ({ children }) => {
         deleteProduct,
         restoreProduct,
         editingProduct,
+        favorites,
+        toggleFavorite,
       }}
     >
       {children}
     </AppContext.Provider>
   );
 };
-
-export const useAppContext = () => useContext(AppContext);
