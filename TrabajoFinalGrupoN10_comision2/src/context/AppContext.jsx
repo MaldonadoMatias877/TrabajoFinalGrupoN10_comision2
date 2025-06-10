@@ -1,5 +1,3 @@
-// src/context/AppContext.js
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AppContext = createContext();
@@ -7,7 +5,7 @@ const AppContext = createContext();
 export const useAppContext = () => useContext(AppContext);
 
 export const AppProvider = ({ children }) => {
-  const [products, setProducts] = useState([]); // Aquí se inicializa como array vacío
+  const [products, setProducts] = useState([]);
   const [idProduct, setIdProduct] = useState(1);
 
   const [favorites, setFavorites] = useState(() => {

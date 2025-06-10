@@ -1,31 +1,29 @@
-// src/components/ProductCard.jsx
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { FaHeart, FaRegHeart } from 'react-icons/fa'; // Importa los íconos de corazón
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-  // Obtén toggleFavorite, favorites y deleteProduct del contexto
+  
   const { toggleFavorite, favorites, deleteProduct } = useAppContext();
 
-  // Determina si el producto actual es favorito
   const isFavorite = favorites.includes(product.id);
 
   const handleDetailsClick = () => {
-    navigate(`/products/${product.id}`); // Navega a la página de detalles
+    navigate(`/products/${product.id}`);
   };
 
   const handleDeleteClick = (e) => {
-    e.stopPropagation(); // Evita que el clic en eliminar active el clic de la tarjeta
+    e.stopPropagation();
     if (window.confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
       deleteProduct(product.id);
     }
   };
 
   const handleToggleFavorite = (e) => {
-    e.stopPropagation(); // Evita que el clic en el corazón active el clic de la tarjeta
+    e.stopPropagation(); 
     toggleFavorite(product.id);
   };
 
@@ -51,6 +49,7 @@ const ProductCard = ({ product }) => {
           <Button variant="primary" size="sm" onClick={handleDetailsClick}>
             Ver detalles
           </Button>
+          
           <Button
             variant="danger"
             size="sm"
@@ -58,11 +57,11 @@ const ProductCard = ({ product }) => {
           >
             Eliminar
           </Button>
-          {/* Botón de corazón para favoritos */}
+          
           <Button
-            variant="link" // Para que parezca un ícono más que un botón tradicional
+            variant="link" 
             onClick={handleToggleFavorite}
-            className="p-0" // Quita padding extra del botón de link
+            className="p-0" 
             style={{ color: isFavorite ? 'red' : 'grey', fontSize: '1.5rem' }}
           >
             {isFavorite ? <FaHeart /> : <FaRegHeart />}
