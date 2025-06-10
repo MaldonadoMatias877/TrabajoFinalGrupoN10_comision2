@@ -1,163 +1,310 @@
-import { useState, useRef } from 'react';
-import { Form, Button } from 'react-bootstrap';
+// src/components/FormProduct.jsx
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Form, Button, Container, Row, Col, Card, Image } from 'react-bootstrap';
 
-function FormProduct() {
-    const { addProduct } = useAppContext();
-    const fileInputRef = useRef(null); // referencia para limpiar el input file
+const ProductsForm = () => {
+  const { addProduct, editingProduct, products } = useAppContext();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const navigate =useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const productId = queryParams.get('id');
 
-    const [formData, setFormData] = useState({
-        name: '',
-        price: '',
-        description: '',
-        category: '',
-        stock: '',
-        dateInit: '',
-        image: null,
-        preview: '',
-    });
+  const initialFormDataState = {
+    name: '',
+    price: '',
+    category: '',
+    stock: '',
+    dateInit: '',
+    description: '',
+    preview: '',
+  };
 
-    const handleChange = (e) => {
-        const { name, value, type, files } = e.target;
+  const [formData, setFormData] = useState(initialFormDataState);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
-        if (type === 'file') {
-            const file = files[0];
-            if (file) {
-                setFormData({
-                    ...formData,
-                    image: file,
-                    preview: URL.createObjectURL(file),
-                });
-            }
-        } else {
-            setFormData({ ...formData, [name]: value });
-        }
-    };
+  const [isFormModified, setIsFormModified] = useState(false);
+  const originalFormData = useRef(initialFormDataState);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const parseData = {
-            ...formData,
-            price: parseFloat(formData.price),
-            stock: parseInt(formData.stock),
+  // useEffect para cargar los datos del producto si estamos en modo edición
+  useEffect(() => {
+    if (productId) {
+      const productToEdit = products.find(p => p.id === parseInt(productId));
+      if (productToEdit) {
+        // Asegúrate de formatear la fecha para el input type="date"
+        const formattedDate = productToEdit.dateInit ? new Date(productToEdit.dateInit).toISOString().split('T')[0] : '';
+        const loadedData = {
+          name: productToEdit.name || '',
+          price: productToEdit.price || '',
+          category: productToEdit.category || '',
+          stock: productToEdit.stock || '',
+          dateInit: formattedDate, // Usar la fecha formateada
+          description: productToEdit.description || '',
+          preview: productToEdit.preview || '',
         };
+        setFormData(loadedData);
+        originalFormData.current = loadedData; // Guarda la data original
+        setIsEditing(true);
+        setSelectedFile(null);
+        setIsFormModified(false); // Al cargar, el formulario no está modificado
+      } else {
+        console.warn(`Producto con ID ${productId} no encontrado para edición.`);
+        setIsEditing(false);
+        setFormData(initialFormDataState);
+        originalFormData.current = initialFormDataState;
+        setSelectedFile(null);
+        setIsFormModified(false);
+      }
+    } else {
+      setIsEditing(false);
+      setFormData(initialFormDataState);
+      originalFormData.current = initialFormDataState;
+      setSelectedFile(null);
+      setIsFormModified(false); // En modo creación, el botón de agregar debe habilitarse cuando hay datos
+    }
+  }, [productId, products]);
 
-        addProduct(formData);
+  // useEffect para verificar si el formulario ha sido modificado
+  useEffect(() => {
+    if (isEditing) {
+      const currentData = {
+        name: formData.name,
+        price: formData.price,
+        category: formData.category,
+        stock: formData.stock,
+        dateInit: formData.dateInit,
+        description: formData.description,
+        preview: formData.preview,
+      };
+      // Comparar formData con originalFormData.current
+      const changed = JSON.stringify(currentData) !== JSON.stringify(originalFormData.current) || selectedFile !== null;
+      setIsFormModified(changed);
+    } else {
+      // En modo creación, el formulario se considera modificado si al menos un campo obligatorio tiene valor
+      const hasAnyRequiredField = formData.name || formData.price || formData.category || formData.stock || formData.dateInit || formData.description || formData.preview || selectedFile;
+      setIsFormModified(hasAnyRequiredField);
+    }
+  }, [formData, selectedFile, isEditing, originalFormData]);
 
-        // Limpia formulario y vista previa
-        setFormData({
-            name: '',
-            price: '',
-            description: '',
-            category: '',
-            stock: '',
-            dateInit: '',
-            image: null,
-            preview: '',
-        });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
 
-        // Limpia input file manualmente
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+    if (name === 'preview' && value !== '') {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
-        navigate('/');
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFormData({ ...formData, preview: '' });
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let finalPreviewUrl = formData.preview;
+
+    if (selectedFile) {
+      finalPreviewUrl = URL.createObjectURL(selectedFile);
+    }
+
+    const productData = {
+      ...formData,
+      preview: finalPreviewUrl,
+      price: parseFloat(formData.price),
+      stock: parseInt(formData.stock),
     };
 
-    return (
-        <Form onSubmit={handleSubmit}>
-            <Form.Group className='mb-3'>
+    if (isEditing) {
+      editingProduct({ ...productData, id: parseInt(productId), state: true });
+    } else {
+      addProduct(productData);
+    }
+
+    setFormData(initialFormDataState);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    setIsFormModified(false);
+    navigate('/');
+  };
+
+  const currentPreview = selectedFile ? URL.createObjectURL(selectedFile) : formData.preview;
+
+  // Helper para mostrar el valor original si es diferente
+  const renderOriginalValueHint = (fieldName) => {
+    if (isEditing && originalFormData.current[fieldName] !== undefined && formData[fieldName] !== originalFormData.current[fieldName]) {
+      let originalValue = originalFormData.current[fieldName];
+      // Si es fecha, se muestra como un string normal para que sea legible
+      if (fieldName === 'dateInit' && originalValue) {
+        originalValue = new Date(originalValue).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      }
+      return (
+        <Form.Text className="text-muted">
+          Original: {originalValue}
+        </Form.Text>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Container className="my-5">
+      <Row className="justify-content-center">
+        <Col md={8} lg={6}>
+          <Card className="shadow-lg border-0 p-4">
+            <h2 className="text-center mb-4">
+              {isEditing ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+            </h2>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Nombre</Form.Label>
-                <Form.Control 
-                    type="text"
-                    name='name'
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
+                <Form.Control
+                  type="text"
+                  placeholder="Introduce el nombre del producto"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('name')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
+              <Form.Group className="mb-3" controlId="formPrice">
                 <Form.Label>Precio</Form.Label>
-                <Form.Control 
-                    type="text"
-                    name='price'
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
+                <Form.Control
+                  type="number"
+                  step="0.01"
+                  placeholder="Precio del Producto"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('price')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
+              <Form.Group className="mb-3" controlId="formCategory">
                 <Form.Label>Categoría</Form.Label>
-                <Form.Control 
-                    type="text"
-                    name='category'
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
+                <Form.Control
+                  type="text"
+                  placeholder="Introduce la categoría"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('category')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
+              <Form.Group className="mb-3" controlId="formStock">
                 <Form.Label>Stock</Form.Label>
-                <Form.Control 
-                    type="text"
-                    name='stock'
-                    value={formData.stock}
-                    onChange={handleChange}
-                    required
+                <Form.Control
+                  type="number"
+                  placeholder="Intruduce el stock disponible"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('stock')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
-                <Form.Label>Día de ingreso</Form.Label>
-                <Form.Control 
-                    type="date"
-                    name='dateInit'
-                    value={formData.dateInit}
-                    onChange={handleChange}
-                    required
+              <Form.Group className="mb-3" controlId="formDateInit">
+                <Form.Label>Fecha de Ingreso</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="dateInit"
+                  value={formData.dateInit}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('dateInit')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
+              <Form.Group className="mb-3" controlId="formDescription">
                 <Form.Label>Descripción</Form.Label>
-                <Form.Control 
-                    as="textarea"
-                    name='description'
-                    value={formData.description}
-                    onChange={handleChange}
-                    required
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Introduce la descripción del producto"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
                 />
-            </Form.Group>
+                {renderOriginalValueHint('description')}
+              </Form.Group>
 
-            <Form.Group className='mb-3'>
-                <Form.Label>Insertar imagen</Form.Label>
-                <Form.Control 
-                    type="file"
-                    name='image'
-                    accept='image/*'
-                    onChange={handleChange}
-                    ref={fileInputRef} // para poder limpiar el campo
-                    required
+              {/* OPCIÓN 1: Subir Archivo */}
+              <Form.Group className="mb-3" controlId="formFile">
+                <Form.Label>Subir Imagen </Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={!!formData.preview} // Deshabilita si hay una URL
+                  ref={fileInputRef} // Asigna la referencia
                 />
-                {formData.preview && (
-                    <img
-                        src={formData.preview}
-                        alt="Vista previa"
-                        className='mt-3'
-                        style={{ maxHeight: '150px' }}
-                    />
-                )}
-            </Form.Group>
+                 {isEditing && !selectedFile && originalFormData.current.preview && (
+                    <Form.Text className="text-muted">
+                        Original URL: {originalFormData.current.preview.substring(0, 50)}...
+                    </Form.Text>
+                 )}
+              </Form.Group>
 
-            <Button type="submit">Guardar producto</Button>
-        </Form>
-    );
-}
+              <p className="text-center my-3">-- O --</p>
 
-export default FormProduct;
+              {/* OPCIÓN 2: URL de Imagen */}
+              <Form.Group className="mb-3" controlId="formPreview">
+                <Form.Label>URL de Imagen</Form.Label>
+                <Form.Control
+                  type="url"
+                  placeholder="JPEG, PNG, GIF, BMP, TIFF, RAW, WEBP, SVG..."
+                  name="preview"
+                  value={formData.preview}
+                  onChange={handleChange}
+                  disabled={!!selectedFile} // Deshabilita si hay un archivo seleccionado
+                />
+                {renderOriginalValueHint('preview')}
+              </Form.Group>
+
+              {/* Previsualización de la imagen */}
+              {currentPreview && (
+                <div className="mb-3 text-center">
+                    <p className="text-muted">Previsualización:</p>
+                    <Image src={currentPreview} thumbnail style={{ maxWidth: '150px', height: 'auto' }} />
+                </div>
+              )}
+
+              <div className="d-grid gap-2 mt-4">
+                <Button variant="primary" type="submit" disabled={isEditing && !isFormModified}>
+                  {isEditing ? 'Guardar Cambios' : 'Agregar Producto'}
+                </Button>
+                <Button variant="secondary" onClick={() => navigate('/')}>
+                  Cancelar
+                </Button>
+              </div>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+
+export default ProductsForm;
