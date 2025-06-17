@@ -4,7 +4,7 @@ import { Row, Col, Container } from 'react-bootstrap';
 import ProductCard from '../components/ProductCard';
 
 const HomePage = () => {
-  const { products } = useAppContext(); // Ya no necesitas deleteProduct directamente aquí
+  const { products } = useAppContext();
 
   const activeProducts = products.filter(p => p.state !== false);
 
