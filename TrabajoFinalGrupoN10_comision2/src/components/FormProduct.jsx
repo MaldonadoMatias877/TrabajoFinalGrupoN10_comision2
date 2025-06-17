@@ -1,4 +1,3 @@
-// src/components/FormProduct.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';

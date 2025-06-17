@@ -1,8 +1,7 @@
-// src/pages/Home.jsx
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Row, Col, Container } from 'react-bootstrap';
-import ProductCard from '../components/ProductCard'; // Importa el nuevo componente ProductCard
+import ProductCard from '../components/ProductCard';
 
 const HomePage = () => {
   const { products } = useAppContext(); // Ya no necesitas deleteProduct directamente aquí
