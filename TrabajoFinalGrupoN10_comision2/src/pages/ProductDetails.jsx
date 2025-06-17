@@ -3,16 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Container, Row, Col, Card, Button, Image } from 'react-bootstrap';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useAuth } from '../context/AuthenticationUserContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  
   const { products, deleteProduct, restoreProduct, favorites, toggleFavorite } = useAppContext();
   const navigate = useNavigate();
-
   const product = products.find(p => p.id === parseInt(id));
-
   const isFavorite = product ? favorites.includes(product.id) : false;
+  const { isAuthenticated } = useAuth();
 
   if (!product) {
     return (
@@ -47,11 +46,10 @@ const ProductDetails = () => {
             <Card.Body>
               <Card.Title className="text-center h3 mb-3">
                 {product.name}
-                {/* Ícono de corazón en el título de la tarjeta de detalles */}
                 <Button
                   variant="link"
                   onClick={handleToggleFavorite}
-                  className="p-0 ms-2" // Pequeño margen a la izquierda
+                  className="p-0 ms-2"
                   style={{ color: isFavorite ? 'red' : 'grey', fontSize: '1.5rem', verticalAlign: 'middle' }}
                 >
                   {isFavorite ? <FaHeart /> : <FaRegHeart />}
@@ -64,34 +62,35 @@ const ProductDetails = () => {
                 {product.dateInit && <strong>Fecha de ingreso:</strong>} {product.dateInit}<br />
                 <strong>Descripción:</strong> {product.description}
               </Card.Text>
+
               <div className="d-grid gap-2">
 
-                <Button variant="info" onClick={() => navigate(`/form?id=${product.id}`)}>
-                  Editar producto
-                </Button>
-
-                
+                {isAuthenticated && (
+                  <Button variant="info" onClick={() => navigate(`/form?id=${product.id}`)}>
+                    Editar producto
+                  </Button>
+                )}
                 <Button variant="secondary" onClick={() => navigate('/')}>
                   Volver a la lista
                 </Button>
-
-                
-                {isProductActive ? (
-                  <Button variant="danger" onClick={() => {
-                    if (window.confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
-                      deleteProduct(product.id);
-                      navigate('/'); // Redirigir a la lista de productos después de eliminar
-                    }
-                  }}>
-                    Eliminar producto
-                  </Button>
-                ) : (
-                  <>
-                    <p className="text-danger text-center">Este producto está inactivo.</p>
-                    <Button variant="success" onClick={() => restoreProduct(product.id)}>
-                      Restaurar producto
+                {isAuthenticated && (
+                  isProductActive ? (
+                    <Button variant="danger" onClick={() => {
+                      if (window.confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
+                        deleteProduct(product.id);
+                        navigate('/');
+                      }
+                    }}>
+                      Eliminar producto
                     </Button>
-                  </>
+                  ) : (
+                    <>
+                      <p className="text-danger text-center">Este producto está inactivo.</p>
+                      <Button variant="success" onClick={() => restoreProduct(product.id)}>
+                        Restaurar producto
+                      </Button>
+                    </>
+                  )
                 )}
               </div>
             </Card.Body>
