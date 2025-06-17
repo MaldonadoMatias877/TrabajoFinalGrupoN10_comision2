@@ -3,11 +3,13 @@ import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useAuth } from '../context/AuthenticationUserContext';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   
   const { toggleFavorite, favorites, deleteProduct } = useAppContext();
+  const { isAuthenticated } = useAuth();
 
   const isFavorite = favorites.includes(product.id);
 
@@ -45,28 +47,31 @@ const ProductCard = ({ product }) => {
         <Card.Text>
           <strong>Categoría:</strong> {product.category}
         </Card.Text>
-        <div className="mt-auto d-flex justify-content-between align-items-center">
-          <Button variant="primary" size="sm" onClick={handleDetailsClick}>
-            Ver detalles
-          </Button>
-          
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={handleDeleteClick}
-          >
-            Eliminar
-          </Button>
-          
-          <Button
-            variant="link" 
-            onClick={handleToggleFavorite}
-            className="p-0" 
-            style={{ color: isFavorite ? 'red' : 'grey', fontSize: '1.5rem' }}
-          >
-            {isFavorite ? <FaHeart /> : <FaRegHeart />}
-          </Button>
-        </div>
+        
+        {isAuthenticated && (
+          <div className="mt-auto d-flex justify-content-between align-items-center">
+            <Button variant="primary" size="sm" onClick={handleDetailsClick}>
+              Ver detalles
+            </Button>
+            
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleDeleteClick}
+            >
+              Eliminar
+            </Button>
+            
+            <Button
+              variant="link" 
+              onClick={handleToggleFavorite}
+              className="p-0" 
+              style={{ color: isFavorite ? 'red' : 'grey', fontSize: '1.5rem' }}
+            >
+              {isFavorite ? <FaHeart /> : <FaRegHeart />}
+            </Button>
+          </div>
+        )}
       </Card.Body>
     </Card>
   );
