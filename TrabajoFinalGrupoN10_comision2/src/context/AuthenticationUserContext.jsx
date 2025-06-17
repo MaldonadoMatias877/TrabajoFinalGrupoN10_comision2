@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   const login = (email, password) => {
-    // Simulación de autenticación (reemplaza esto por una API real si quieres)
+
     if (email === 'admin@gmail.com' && password === '1234') {
       setUser({ email });
       return true;

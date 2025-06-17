@@ -48,11 +48,12 @@ const ProductCard = ({ product }) => {
           <strong>Categoría:</strong> {product.category}
         </Card.Text>
         
+        <Button variant="primary" size="sm" onClick={handleDetailsClick}>
+           Ver detalles
+        </Button>
         {isAuthenticated && (
           <div className="mt-auto d-flex justify-content-between align-items-center">
-            <Button variant="primary" size="sm" onClick={handleDetailsClick}>
-              Ver detalles
-            </Button>
+            
             
             <Button
               variant="danger"

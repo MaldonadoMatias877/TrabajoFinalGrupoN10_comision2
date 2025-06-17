@@ -16,7 +16,7 @@ function App(){
       <Container className='mt-4'>        
         <Routes>
         <Route path="/" element={<HomePage />} />
-        {/*<Route path="/products/:id" element={<ProductDetails />} />*/}
+        <Route path="/products/:id" element={<ProductDetails />}/>
         <Route path="/login" element={<Login />} />
 
         {/* Rutas protegidas */}
