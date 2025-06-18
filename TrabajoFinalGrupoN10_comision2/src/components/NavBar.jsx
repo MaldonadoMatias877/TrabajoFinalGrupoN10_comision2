@@ -9,7 +9,7 @@ const NavBar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Redirige al home después de cerrar sesión
+    navigate('/');
   };
 
   const handleLogin = () => {
@@ -17,40 +17,50 @@ const NavBar = () => {
   };
 
   return (
-    <Navbar bg='light' expand='md'>
-      <Container>
-        <Navbar.Brand as={Link} to='/'>Mercadito mayorista</Navbar.Brand>
-        <Navbar.Toggle aria-controls='basic-navbar-nav' />
-        <Navbar.Collapse id='basic-navbar-nav' className='justify-content-between'>
+    <>
+      {/* Primer nivel: solo el nombre del sitio */}
+      <Navbar bg='light' className='border-bottom'>
+        <Container className='justify-content-center'>
+          <Navbar.Brand as={Link} to='/' className='fs-1 fw-bold'>
+            Mercadito mayorista
+          </Navbar.Brand>
+        </Container>
+      </Navbar>
 
-          <Nav className='gap-3'>
-            <Nav.Link as={Link} to='/'>Lista de productos</Nav.Link>
-            {isAuthenticated && (
-              <>
-                <Nav.Link as={Link} to='/favorites'>Favoritos</Nav.Link>
-                <Nav.Link as={Link} to='/form'>Agregar Producto</Nav.Link>
-              </>
-            )}
-          </Nav>
+      {/* Segundo nivel: navegación y login */}
+      <Navbar bg='light' expand='md'>
+        <Container>
+          <Navbar.Toggle aria-controls='basic-navbar-nav' />
+          <Navbar.Collapse id='basic-navbar-nav' className='justify-content-between'>
 
-          <div className="d-flex align-items-center gap-3">
-            {isAuthenticated ? (
-              <>
-                {/*<span className="text-muted small mb-0">Hola, {user.email}</span>*/}
-                <span className="text-muted small mb-0">Hola,administrador</span>
-                <Button variant="outline-danger" size="sm" onClick={handleLogout}>
-                  Cerrar sesión
+            <Nav className='gap-3'>
+              <Nav.Link as={Link} to='/' className='fs-4'>Lista de productos</Nav.Link>
+              {isAuthenticated && (
+                <>
+                  <Nav.Link as={Link} to='/favorites' className='fs-4'>Favoritos</Nav.Link>
+                  <Nav.Link as={Link} to='/form' className='fs-4'>Agregar Producto</Nav.Link>
+                </>
+              )}
+            </Nav>
+
+            <div className="d-flex align-items-center gap-3">
+              {isAuthenticated ? (
+                <>
+                  <span className="text-muted small mb-0 fs-4">Hola, administrador</span>
+                  <Button variant="outline-danger" size="sm" onClick={handleLogout}>
+                    Cerrar sesión
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline-primary" size="sm" onClick={handleLogin}>
+                  Iniciar sesión
                 </Button>
-              </>
-            ) : (
-              <Button variant="outline-primary" size="sm" onClick={handleLogin}>
-                Iniciar sesión
-              </Button>
-            )}
-          </div>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+              )}
+            </div>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
   );
 };
 
