@@ -10,7 +10,7 @@ const HomePage = () => {
 
   return (
     <Container className="my-5">
-      <h1 className="text-center mb-4">Lista de Productos Disponibles</h1>
+      <h1 className="text-center mb-4 fs-3">Lista de Productos Disponibles</h1>
 
       {activeProducts.length === 0 ? (
         <p className="text-muted text-center">No hay productos disponibles.</p>
