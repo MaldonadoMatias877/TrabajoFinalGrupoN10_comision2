@@ -17,6 +17,21 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+  useEffect(() => {
+    fetch('https://fakestoreapi.com/products')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Error al obtener productos');
+        }
+        return res.json();
+      })
+      .then(data => {
+        setProducts(data);
+      })
+      .catch(error => {
+        console.error('Error al cargar productos:', error.message);
+      });
+  }, []);
   
 
   const addProduct = (product) => {

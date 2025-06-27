@@ -8,6 +8,7 @@ const HomePage = () => {
 
   const activeProducts = products.filter(p => p.state !== false);
 
+
   return (
     <Container className="my-5">
       <h1 className="text-center mb-4 fs-3">Lista de Productos Disponibles</h1>
