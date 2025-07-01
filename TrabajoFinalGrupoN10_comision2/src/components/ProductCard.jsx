@@ -5,7 +5,6 @@ import { useAppContext } from '../context/AppContext';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useAuth } from '../context/AuthenticationUserContext';
 
-
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   
@@ -32,14 +31,15 @@ const ProductCard = ({ product }) => {
 
   return (
     <Card className="h-100 shadow-sm" style={{ cursor: 'pointer' }}>
-        <Card.Img
+      {/* Usamos product.preview y product.name directamente */}
+      <Card.Img
         variant="top"
-        src={product.preview || product.image}
-        alt={product.name || product.title}
+        src={product.preview}
+        alt={product.name}
         style={{ height: '200px', objectFit: 'contain' }}
-        />    
+      />    
       <Card.Body className="d-flex flex-column">
-        <Card.Title className="text-center">{product.name || product.title}</Card.Title>
+        <Card.Title className="text-center">{product.name}</Card.Title>
         <Card.Text>
           <strong>Precio:</strong> ${parseFloat(product.price).toFixed(2)}
         </Card.Text>
@@ -48,12 +48,10 @@ const ProductCard = ({ product }) => {
         </Card.Text>
         
         <Button variant="primary" size="sm" onClick={handleDetailsClick}>
-           Ver detalles
+            Ver detalles
         </Button>
         {isAuthenticated && (
           <div className="mt-auto d-flex justify-content-between align-items-center">
-            
-            
             <Button
               variant="danger"
               size="sm"
