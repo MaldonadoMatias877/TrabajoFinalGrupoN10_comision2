@@ -9,6 +9,8 @@ const ProductDetails = () => {
   const { id } = useParams();
   const { products, deleteProduct, restoreProduct, favorites, toggleFavorite } = useAppContext();
   const navigate = useNavigate();
+
+  // Asegúrate de que el ID sea un número para la comparación
   const product = products.find(p => p.id === parseInt(id));
   const isFavorite = product ? favorites.includes(product.id) : false;
   const { isAuthenticated } = useAuth();
@@ -35,17 +37,18 @@ const ProductDetails = () => {
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
           <Card className="shadow-lg border-0">
+            {/* Usamos product.preview directamente */}
             {product.preview && (
               <Card.Img
                 variant="top"
                 src={product.preview}
-                alt={product.name}
+                alt={product.name} // Usamos product.name directamente
                 style={{ maxHeight: '350px', objectFit: 'cover' }}
               />
             )}
             <Card.Body>
               <Card.Title className="text-center h3 mb-3">
-                {product.name}
+                {product.name} {/* Usamos product.name directamente */}
                 <Button
                   variant="link"
                   onClick={handleToggleFavorite}
@@ -56,6 +59,7 @@ const ProductDetails = () => {
                 </Button>
               </Card.Title>
               <Card.Text>
+                {/* Todas las propiedades ahora deben existir y ser consistentes */}
                 <strong>Precio:</strong> ${parseFloat(product.price).toFixed(2)}<br />
                 <strong>Categoría:</strong> {product.category}<br />
                 <strong>Stock:</strong> {product.stock || 'N/A'}<br />
@@ -64,7 +68,6 @@ const ProductDetails = () => {
               </Card.Text>
 
               <div className="d-grid gap-2">
-
                 {isAuthenticated && (
                   <Button variant="info" onClick={() => navigate(`/form?id=${product.id}`)}>
                     Editar producto
