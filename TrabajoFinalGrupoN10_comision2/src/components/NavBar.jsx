@@ -16,6 +16,10 @@ const NavBar = () => {
     navigate('/login');
   };
 
+  const handleRegister = () => {
+    navigate('/registro');
+  }
+
   return (
     <>
       {/* Primer nivel: solo el nombre del sitio */}
@@ -52,9 +56,15 @@ const NavBar = () => {
                   </Button>
                 </>
               ) : (
-                <Button variant="outline-primary" size="sm" onClick={handleLogin}>
-                  Iniciar sesión
-                </Button>
+                <>
+                  <Button variant="outline-primary" size="sm" onClick={handleLogin}>
+                    Iniciar sesión
+                  </Button>
+                  <Button variant='outline-primary' size='sm' onClick={handleRegister}>
+                    Registrarse
+                  </Button>
+                </>
+                
               )}
             </div>
           </Navbar.Collapse>
