@@ -43,7 +43,7 @@ const ProductDetails = () => {
                 variant="top"
                 src={product.preview}
                 alt={product.name} // Usamos product.name directamente
-                style={{ maxHeight: '350px', objectFit: 'cover' }}
+                style={{ maxHeight: '350px', objectFit: 'contain' }}
               />
             )}
             <Card.Body>
