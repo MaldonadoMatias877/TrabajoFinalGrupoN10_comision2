@@ -1,38 +1,56 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-const AuthContext = createContext();//createContext es una funcion proporcionada por react
+const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export function AuthProvider({ children }) {
+  const [admin, setAdmin] = useState(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Intentar recuperar desde localStorage
-    const storedUser = localStorage.getItem('authUser');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
+  // Al iniciar, verificamos si hay sesión activa
   useEffect(() => {
-    localStorage.setItem('authUser', JSON.stringify(user));
-  }, [user]);
-
-  const login = (email, password) => {
-
-    if (email === 'admin@gmail.com' && password === '1234') {
-      setUser({ email });
-      return true;
+    const storedAdmin = localStorage.getItem('adminSession');
+    if (storedAdmin) {
+      setAdmin(JSON.parse(storedAdmin));
     }
-    return false;
+  }, []);
+
+  // Función para registrar un administrador (se llama desde el formulario)
+  const register = (adminData) => {
+    localStorage.setItem('adminUser', JSON.stringify(adminData));
   };
 
+  // Función para iniciar sesión
+  const login = ({ usuario, password }) => {
+    const storedUser = JSON.parse(localStorage.getItem('adminUser'));
+
+    if (
+      storedUser &&
+      storedUser.usuario === usuario &&
+      storedUser.password === password
+    ) {
+      localStorage.setItem('adminSession', JSON.stringify(storedUser));
+      setAdmin(storedUser);
+      return { success: true };
+    } else {
+      return { success: false, message: 'Credenciales incorrectas' };
+    }
+  };
+
+  // Función para cerrar sesión
   const logout = () => {
-    setUser(null);
+    localStorage.removeItem('adminSession');
+    setAdmin(null);
   };
-
-  const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ admin, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+// Hook para usar el contexto
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+
