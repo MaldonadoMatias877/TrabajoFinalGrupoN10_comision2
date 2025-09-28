@@ -1,39 +1,19 @@
 import { Routes, Route } from 'react-router-dom';
-import PrivateRoute from '../components/PrivateRoutes';
 import HomePage from '../pages/HomePage';
-import ProductDetails from '../pages/ProductDetails';
-import Favorites from '../pages/Favorites';
-import ProductsForm from '../components/FormProduct';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
+import AdminPage from '../pages/AdminPage';
+import AdminLoginPage from '../pages/AdminLoginPage';
+import AdminRegisterPage from '../pages/AdminRegisterPage';
+import EditarProductoPage from '../pages/EditarProductoPage';  // Importa el componente nuevo
 
-const AppRoutes = () => {
+export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/products/:id" element={<ProductDetails />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Register />} />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/registro" element={<AdminRegisterPage />} /> {/* Unificado 'registro' */}
+      <Route path="/admin/editar/:productId" element={<EditarProductoPage />} />
 
-      {/* Rutas protegidas */}
-      <Route
-        path="/favorites"
-        element={
-          <PrivateRoute>
-            <Favorites />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/form"
-        element={
-          <PrivateRoute>
-            <ProductsForm />
-          </PrivateRoute>
-        }
-      />
     </Routes>
   );
-};
-
-export default AppRoutes;
+}

@@ -1,31 +1,30 @@
-import React from 'react';
-import { useAppContext } from '../context/AppContext';
-import { Row, Col, Container } from 'react-bootstrap';
-import ProductCard from '../components/ProductCard';
+import { useEffect, useState } from 'react';
+import { Row, Col } from 'react-bootstrap';
+import productosData from '../data/productos.json';
+import CardProduct from '../components/CardProduct';
 
-const HomePage = () => {
-  const { products } = useAppContext();
+export default function HomePage() {
+  const [productos, setProductos] = useState([]);
 
-  const activeProducts = products.filter(p => p.state !== false);
-
+  useEffect(() => {
+    setProductos(productosData);
+  }, []);
 
   return (
-    <Container className="my-5">
-      <h1 className="text-center mb-4 fs-3">Lista de Productos Disponibles</h1>
-
-      {activeProducts.length === 0 ? (
-        <p className="text-muted text-center">No hay productos disponibles.</p>
-      ) : (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {activeProducts.map(product => (
-            <Col key={product.id}>
-              <ProductCard product={product} />
-            </Col>
-          ))}
-        </Row>
-      )}
-    </Container>
+    <>
+      <h1 className='text-center'>Lista de productos</h1>
+      <Row className="g-4">
+        {productos.map(producto => (
+          <Col
+            key={producto.id}
+            xs={12}     // 1 por fila en pantallas muy pequeñas
+            sm={4}      // 3 por fila en pantallas chicas/medianas (12 / 4 = 3)
+            lg={3}      // 4 por fila en pantallas grandes (12 / 3 = 4)
+          >
+            <CardProduct product={producto} />
+          </Col>
+        ))}
+      </Row>
+    </>
   );
-};
-
-export default HomePage;
+}
