@@ -1,10 +1,16 @@
 import { Card, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 export default function CardProduct({ product }) {
+  const navigate = useNavigate();
+
+  const handleBuyClick = () => {
+    navigate(`/producto/${product.id}`, { state: { product } });
+  };
+
   return (
     <Card className="h-100">
-      {/* Imagen */}
-      <div style={{ height: '200px', overflow: 'hidden' }}>
+      <div style={{ height: '200px', overflow: 'hidden', marginTop: '10px' }}>
         <Card.Img
           variant="top"
           src={product.image}
@@ -13,20 +19,14 @@ export default function CardProduct({ product }) {
         />
       </div>
 
-      {/* Contenido */}
       <Card.Body className="d-flex flex-column">
-        {/* Título fijo arriba */}
         <Card.Title>{product.title}</Card.Title>
-
-        {/* Espaciador flexible */}
         <div className="flex-grow-1" />
-
-        {/* Precio + botón */}
         <div className="d-flex flex-column align-items-center gap-2">
           <Card.Text className="m-0">
             <strong>Precio:</strong> ${product.price}
           </Card.Text>
-          <Button variant="primary">Comprar</Button>
+          <Button variant="primary" onClick={handleBuyClick}>Ver detalles del producto</Button>
         </div>
       </Card.Body>
     </Card>
